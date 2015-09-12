@@ -15,7 +15,7 @@ use Yii;
  * StorageEngine is the model class for table "storage_engine".
  *
  * @property string $id
- * @property string $handler
+ * @property string $system_id
  * @property string $data
  * @property string $created
  * @property string $modified
@@ -54,7 +54,7 @@ class StorageEngine extends \canis\db\ActiveRecord
             [['data'], 'string'],
             [['created', 'modified'], 'safe'],
             [['id'], 'string', 'max' => 36],
-            [['handler'], 'string', 'max' => 255],
+            [['system_id'], 'string', 'max' => 255],
         ];
     }
 
@@ -65,7 +65,7 @@ class StorageEngine extends \canis\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'handler' => 'Handler',
+            'system_id' => 'Handler',
             'data' => 'Data',
             'created' => 'Created',
             'modified' => 'Modified',
@@ -89,8 +89,8 @@ class StorageEngine extends \canis\db\ActiveRecord
      */
     public function getStorageHandler()
     {
-        if (Yii::$app->collectors['storageHandlers']->has($this->handler)) {
-            return Yii::$app->collectors['storageHandlers']->getOne($this->handler);
+        if (Yii::$app->collectors['storageEngine']->has($this->system_id)) {
+            return Yii::$app->collectors['storageEngine']->getOne($this->system_id);
         }
 
         return false;

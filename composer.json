@@ -14,7 +14,7 @@
 	"require-dev": {
 	},
     "autoload": {
-		"psr-4": { "canis\\userManager\\": "src" }
+		"psr-4": { "canis\\storage\\": "src" }
     },
     "extra": {
     	"bootstrap": "canis\\storage\\Extension"

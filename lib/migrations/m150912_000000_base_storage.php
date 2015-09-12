@@ -1,8 +1,8 @@
 <?php
 
-namespace canis\db\migrations;
+namespace canis\storage\migrations;
 
-class m131021_005748_base_canis extends \canis\db\Migration
+class m150912_000000_base_storage extends \canis\db\Migration
 {
     public function up()
     {
@@ -11,7 +11,7 @@ class m131021_005748_base_canis extends \canis\db\Migration
 
         $this->createTable('storage_engine', [
             'id' => 'char(36) CHARACTER SET ascii COLLATE ascii_bin NOT NULL PRIMARY KEY',
-            'handler' => 'string(255) DEFAULT NULL',
+            'system_id' => 'string(255) DEFAULT NULL',
             'data' => 'blob DEFAULT NULL',
             'created' => 'datetime DEFAULT NULL',
             'modified' => 'datetime DEFAULT NULL',
