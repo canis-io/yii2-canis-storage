@@ -1,0 +1,22 @@
+{
+	"name": "canis/yii2-canis-storage",
+	"description": "Canis's storage handler",
+	"keywords": ["yii", "canis"],
+	"homepage": "http://psesd.org",
+	"type": "yii2-extension",
+	"license": "BSD-3-Clause",
+	"minimum-stability": "dev",
+	"require": {
+		"php": ">=5.4.0",
+		"canis/yii2-canis-lib": "*",
+        "aws/aws-sdk-php": "3.3.*"
+	},
+	"require-dev": {
+	},
+    "autoload": {
+		"psr-4": { "canis\\userManager\\": "src" }
+    },
+    "extra": {
+    	"bootstrap": "canis\\storage\\Extension"
+    }
+}
