@@ -31,7 +31,7 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
      */
     public $error;
 
-    public $destructiveShift = false;
+    public $destructiveShift = true;
 
 
     /**
@@ -173,6 +173,7 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
         }
         $storage = $this->prepareStorage();
         $fill = $this->handleShift($record, $storage, $model, $attribute);
+
         $result = $storage->fillKill($fill);
         if ($result) {
             $model->{$attribute} = $storage->primaryKey;

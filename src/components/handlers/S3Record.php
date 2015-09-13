@@ -89,11 +89,18 @@ class S3Record extends \canis\storage\components\BaseRecord
 
 	public function copy($newName)
 	{
-		$result = $this->handler->getClient()->copyObject([
+		$options = [
 			'Bucket' => $this->handler->bucket, 
 			'CopySource' => $this->handler->bucket ."/". $this->key, 
 			'Key' => $newName
-		]);
+		];
+        if ($this->handler->encrypt) {
+            $options['ServerSideEncryption'] = 'AES256';
+        }
+        if ($this->handler->encrypt) {
+            $options['StorageClass'] = $this->handler->reducedRedundancy ? 'REDUCED_REDUNDANCY' : 'STANDARD';
+        }
+		$result = $this->handler->getClient()->copyObject($options);
 		if ($result && $result->getPath('CopyObjectResult.ETag') !== null) {
 			return true;
 		}
