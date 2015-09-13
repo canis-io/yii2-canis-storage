@@ -58,7 +58,7 @@ class Collector extends \canis\base\collector\Module
     {
         $health = [];
         foreach ($this->getAll() as $engineItem) {
-            $health[$engineItem->systemId] = $engineItem->handler->isHealthy();
+            $health[$engineItem->systemId] = $engineItem->storageHandler->isHealthy();
         }
         return $health;
     }

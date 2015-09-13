@@ -104,7 +104,7 @@ class Storage extends \canis\db\ActiveRecord
     {
         $className = self::className();
         $blank = new $className();
-        $blank->storage_engine_id = $engine->primaryKey;
+        $blank->storage_engine_id = $engine->model->primaryKey;
         if ($blank->save()) {
             return $blank;
         }

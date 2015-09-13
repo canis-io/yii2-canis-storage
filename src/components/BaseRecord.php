@@ -17,10 +17,11 @@ abstract class BaseRecord extends \canis\base\Component
 	}
 
 	abstract public function collect();
-	abstract public function isStillAvailable();
+	abstract public function exists();
 	abstract public function getFileName();
 	abstract public function getSize();
 	abstract public function getMimeType();
 	abstract public function delete();
 	abstract public function rename($newName);
+	abstract public function copy($newName);
 }

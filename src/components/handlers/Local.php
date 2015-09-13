@@ -9,6 +9,7 @@
 namespace canis\storage\components\handlers;
 
 use canis\storage\models\Storage;
+use canis\storage\components\BaseRecord;
 use canis\base\exceptions\Exception;
 use canis\base\FileInterface;
 use canis\helpers\Date;
@@ -20,7 +21,7 @@ use yii\helpers\FileHelper;
  *
  * @author Jacob Morrison <email@ofjacob.com>
  */
-class Local extends \canis\storage\components\BaseHandler implements \canis\storageHandlers\UploadInterface
+class Local extends \canis\storage\components\BaseHandler implements \canis\storage\components\UploadInterface
 {
     /**
      * @var [[@doctodo var_type:localFileClass]] [[@doctodo var_description:localFileClass]]
@@ -143,6 +144,12 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         return $dirPath . DIRECTORY_SEPARATOR . $model->primaryKey;
     }
 
+    
+    public function getEngineStoragePath(Storage $storage)
+    {
+        return implode(DIRECTORY_SEPARATOR, $this->buildKey()) . DIRECTORY_SEPARATOR . $storage->primaryKey;
+    }
+
     /**
      * [[@doctodo method_description:handleUpload]].
      *
@@ -178,8 +185,6 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
 
             return $package;
         }
-        var_dump($path);
-
         return false;
     }
 

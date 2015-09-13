@@ -12,6 +12,7 @@ use canis\storage\models\Storage;
 use canis\base\exceptions\Exception;
 use canis\base\FileInterface;
 use canis\helpers\Date;
+use canis\storage\components\BaseRecord;
 use Yii;
 use yii\helpers\FileHelper;
 use Aws\S3\S3Client;
@@ -21,7 +22,7 @@ use Aws\S3\S3Client;
  *
  * @author Jacob Morrison <email@ofjacob.com>
  */
-class S3 extends \canis\storage\components\BaseHandler implements \canis\base\UploadInterface
+class S3 extends \canis\storage\components\BaseHandler implements \canis\storage\components\UploadInterface
 {
 
     public $accessKey;
@@ -85,14 +86,14 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\base\Up
         $baseKey = explode('.', $path);
         $results = $this->getClient()->listObjects([
             'Bucket' => $this->bucket,
-            'Prefix' => implode("/", $path)
+            'Prefix' => implode("/", $baseKey)
         ]);
         $records = [];
         foreach ($results->get('Contents') as $file) {
             if (substr($file['Key'], -1) === '/') { continue; }
             $records[] = $this->getFileRecord($file);
         }
-        return [];
+        return $records;
     }
 
     public function getFileRecord($file)
@@ -253,6 +254,11 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\base\Up
         return false;
     }
 
+    public function getEngineStoragePath(Storage $storage)
+    {
+        return implode('/', $this->buildKey()) . '/' . $storage->primaryKey;
+    }
+
     /**
      * [[@doctodo method_description:handleUpload]].
      *
@@ -270,7 +276,7 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\base\Up
         $package = [];
         $baseKey = $this->buildKey();
         $package['storage_key'] = implode('.', $baseKey);
-        $key = implode('/', $baseKey) . '/' . $storage->primaryKey;
+        $key = $this->getEngineStoragePath($storage);
         $file = $model->{$attribute};
         $filePath = $file->tempName;
         try {

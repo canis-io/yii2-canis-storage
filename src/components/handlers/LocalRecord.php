@@ -6,12 +6,12 @@
  * @license http://canis.io/license/
  */
 
-namespace canis\storage\handlers;
+namespace canis\storage\components\handlers;
 
 use Yii;
 use yii\helpers\FileHelper;
 
-class LocalRecord extends \canis\storage\BaseRecord
+class LocalRecord extends \canis\storage\components\BaseRecord
 {
 	public $file;
 	public $mime;
@@ -24,7 +24,7 @@ class LocalRecord extends \canis\storage\BaseRecord
 		return $this->file;
 	}
 
-	public function isStillAvailable()
+	public function exists()
 	{
 		if (!file_exists($this->file)) {
 			return false;
@@ -69,6 +69,19 @@ class LocalRecord extends \canis\storage\BaseRecord
 	{
 		@unlink($this->file);
 		return true;
+	}
+
+
+	public function copy($newName)
+	{
+		$baseName = basename($this->fileName);
+		$newPath = substr($this->file, 0, strlen($this->file) - strlen($baseName)) . $newName;
+		copy($this->file, $newPath);
+		if (file_exists($newPath)) {
+			$this->file = $newPath;
+			return true;
+		}
+		return false;
 	}
 
 	public function rename($newName)

@@ -6,7 +6,7 @@
  * @license http://canis.io/license/
  */
 
-namespace canis\storageHandlers\core;
+namespace canis\storage\components\handlers;
 
 use Yii;
 use yii\helpers\FileHelper;
@@ -16,7 +16,7 @@ use yii\helpers\FileHelper;
  *
  * @author Jacob Morrison <email@ofjacob.com>
  */
-class S3Record extends \canis\storage\BaseRecord
+class S3Record extends \canis\storage\components\BaseRecord
 {
 	public $key;
 	public $size;
@@ -28,11 +28,11 @@ class S3Record extends \canis\storage\BaseRecord
 		if (!isset($this->_tmp)) {
 	        $this->_tmp = Yii::$app->fileStorage->getTempFile();
 	        $args = [
-	            'Bucket' => $this->engine->bucket,
+	            'Bucket' => $this->handler->bucket,
 	            'Key' => $this->key,
 	            'SaveAs' => $this->_tmp
 	        ];
-	        $result = $this->engine->execute('GetObject', $args);
+	        $result = $this->handler->getClient()->getObject($args);
 	        if (!$result || !file_exists($this->_tmp) || filesize($this->_tmp)) {
 	        	$this->_tmp = false;
 	        	return false;
@@ -41,9 +41,14 @@ class S3Record extends \canis\storage\BaseRecord
 		return $this->file;
 	}
 
-	public function isStillAvailable()
+	public function getHandler()
 	{
-		return $this->engine->getClient()->doesObjectExist($this->engine->bucket, $this->engine->getKey($model));
+		return $this->engine->storageHandler;
+	}
+
+	public function exists()
+	{
+		return $this->handler->getClient()->doesObjectExist($this->handler->bucket, $this->key);
 	}
 
 	public function getFileName()
@@ -75,29 +80,36 @@ class S3Record extends \canis\storage\BaseRecord
 
 	public function delete()
 	{
-		$result = $this->engine->getClient()->deleteObject([
-			'Bucket' => $this->engine->bucket, 
+		$result = $this->handler->getClient()->deleteObject([
+			'Bucket' => $this->handler->bucket, 
 			'Key' => $this->key
 		]);
 		return $result && $result->get('DeleteMarker') === true;
 	}
 
-	public function rename($newName)
+	public function copy($newName)
 	{
-		$result = $this->engine->getClient()->copyObject([
-			'Bucket' => $this->engine->bucket, 
-			'CopySource' => $this->engine->bucket ."/". $this->key, 
+		$result = $this->handler->getClient()->copyObject([
+			'Bucket' => $this->handler->bucket, 
+			'CopySource' => $this->handler->bucket ."/". $this->key, 
 			'Key' => $newName
 		]);
-		if ($result && $result->get('CopyObjectResult.ETag') !== null) {
-			$deleteResult = $this->engine->getClient()->deleteObject([
-				'Bucket' => $this->engine->bucket, 
+		if ($result && $result->getPath('CopyObjectResult.ETag') !== null) {
+			return true;
+		}
+		return false;
+	}
+
+	public function rename($newName)
+	{
+		if ($this->copy($newName)) {
+			$result = $this->handler->getClient()->deleteObject([
+				'Bucket' => $this->handler->bucket, 
 				'Key' => $this->key
 			]);
 			$this->key = $newName;
-			return $deleteResult && $deleteResult->get('DeleteMarker') === true;
+			return $result && $result->getPath('DeleteMarker') === true;
 		}
 		return false;
-
 	}
 }

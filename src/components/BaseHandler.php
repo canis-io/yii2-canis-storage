@@ -31,6 +31,8 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
      */
     public $error;
 
+    public $destructiveShift = false;
+
 
     /**
      * @var [[@doctodo var_type:localFileClass]] [[@doctodo var_description:localFileClass]]
@@ -56,6 +58,28 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
      * @param [[@doctodo param_type:attribute]] $attribute [[@doctodo param_description:attribute]]
      */
     abstract public function handleSave(Storage $storage, $model, $attribute);
+
+    abstract public function getEngineStoragePath(Storage $storage);
+
+    public function handleShift(BaseRecord $record, Storage $storage, $model, $attribute)
+    {
+        $package = [];
+        $baseKey = $this->buildKey();
+        $package['storage_key'] = implode('.', $baseKey);
+        $key = $this->getEngineStoragePath($storage);
+        if ($this->destructiveShift) {
+            $result = $record->rename($key);
+        } else {
+            $result = $record->copy($key);
+        }
+        if ($result) {
+            $package['file_name'] = $record->fileName;
+            $package['size'] = $record->size;
+            $package['type'] = $record->mimeType;
+            return $package;
+        }
+        return false;
+    }
 
     /**
      * [[@doctodo method_description:serve]].
@@ -136,12 +160,10 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
     protected function prepareStorage()
     {
         $storageClass = Yii::$app->classes['Storage'];
-
-        return $storageClass::startBlank($this->engine);
+        return $storageClass::startBlank($this->storageEngine);
     }
 
-
-    public function createStorageFromSelf($record)
+    public function createStorageFromSelf(BaseRecord $record, $model, $attribute)
     {
         if ($record->engine !== $this->storageEngine) {
             return false;
@@ -150,6 +172,13 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
             return false;
         }
         $storage = $this->prepareStorage();
+        $fill = $this->handleShift($record, $storage, $model, $attribute);
+        $result = $storage->fillKill($fill);
+        if ($result) {
+            $model->{$attribute} = $storage->primaryKey;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -236,5 +265,4 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
 
         return $vars;
     }
-
 }
