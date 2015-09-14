@@ -40,6 +40,8 @@ class StorageBehavior extends \canis\db\behaviors\ActiveRecord
      */
     public $required = true;
 
+    public $validateFileOnSave = true;
+
     /**
      * Converts object to string.
      *
@@ -168,12 +170,12 @@ class StorageBehavior extends \canis\db\behaviors\ActiveRecord
         if (is_null($this->storageEngine)) {
             $this->storageEngine = $this->storageObject->storageEngine;
         }
-        if (!$this->storageHandler->afterDelete($storageObject)) {
-            $event->isValid = false;
-
+        if ($storageObject && !$this->storageHandler->afterDelete($storageObject)) {
             return false;
+        } elseif ($storageObject) {
+            return $storageObject->delete();
         }
-        $storageObject->delete();
+        return false;
     }
 
     /**

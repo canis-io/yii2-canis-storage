@@ -107,7 +107,7 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
             } else {
                 $errorMessage = 'An error occurred during file transport.';
             }
-        } elseif (!$model->isNewRecord) {
+        } elseif (!$model->isNewRecord || !$model->validateFileOnSave) {
             return true;
         }
         $model->addError($attribute, $errorMessage);
@@ -173,7 +173,7 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
         }
         $storage = $this->prepareStorage();
         $fill = $this->handleShift($record, $storage, $model, $attribute);
-
+        
         $result = $storage->fillKill($fill);
         if ($result) {
             $model->{$attribute} = $storage->primaryKey;

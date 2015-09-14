@@ -33,12 +33,12 @@ class S3Record extends \canis\storage\components\BaseRecord
 	            'SaveAs' => $this->_tmp
 	        ];
 	        $result = $this->handler->getClient()->getObject($args);
-	        if (!$result || !file_exists($this->_tmp) || filesize($this->_tmp)) {
+	        if (!$result || !file_exists($this->_tmp) || filesize($this->_tmp) === 0) {
 	        	$this->_tmp = false;
 	        	return false;
 	        }
 		}
-		return $this->file;
+		return $this->_tmp;
 	}
 
 	public function getHandler()

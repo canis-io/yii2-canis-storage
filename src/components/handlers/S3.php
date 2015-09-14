@@ -150,9 +150,16 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
             }
             Yii::$app->response->sendFile($path, trim($model->file_name), ['mimeType' => $model->type]);
         } else {
-            // @todo fix this
-            // Yii::$app->response->redirect($this->getClient()->createPresignedRequest($this->getKey($model), $this->presignedExpireTime));
-            Yii::$app->end(0);
+            $cmd = $this->getClient()->getCommand('GetObject', [
+                'Bucket' => $this->bucket,
+                'Key'    => $this->getKey($model),
+                'ResponseContentDisposition' => 'attachment; filename="'.$model->file_name.'"'
+            ]);
+            $response = $this->getClient()->createPresignedRequest($cmd, $this->presignedExpireTime);
+            if ($response && ($uri = $response->getUri())) {
+                Yii::$app->response->redirect($uri->__toString());
+                Yii::$app->end(0);
+            }
         }
         return true;
     }
@@ -218,7 +225,16 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
      */
     public function afterDelete(Storage $model)
     {
-        
+        if (!$model) {
+            return true;
+        }
+        $result = $this->getClient()->deleteObject([
+            'Bucket' => $this->bucket, 
+            'Key' => $this->getKey($model)
+        ]);
+        if (!$result) {
+            return false;
+        }
         return true;
     }
 

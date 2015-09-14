@@ -107,6 +107,9 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
      */
     public function afterDelete(Storage $model)
     {
+        if (!$model) {
+            return true;
+        }
         $path = $this->getPath($model);
         if (file_exists($path)) {
             @unlink($path);

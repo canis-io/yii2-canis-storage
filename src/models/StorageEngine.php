@@ -89,8 +89,8 @@ class StorageEngine extends \canis\db\ActiveRecord
      */
     public function getStorageHandler()
     {
-        if (Yii::$app->collectors['storageEngine']->has($this->system_id)) {
-            return Yii::$app->collectors['storageEngine']->getOne($this->system_id);
+        if (Yii::$app->collectors['storageEngines']->has($this->system_id)) {
+            return Yii::$app->collectors['storageEngines']->getOne($this->system_id);
         }
 
         return false;
