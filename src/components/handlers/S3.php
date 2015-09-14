@@ -89,6 +89,9 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
             'Prefix' => implode("/", $baseKey)
         ]);
         $records = [];
+        if (empty($results->get('Contents'))) {
+            return $records;
+        }
         foreach ($results->get('Contents') as $file) {
             if (substr($file['Key'], -1) === '/') { continue; }
             $records[] = $this->getFileRecord($file);
