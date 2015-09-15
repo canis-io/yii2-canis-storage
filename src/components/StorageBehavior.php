@@ -170,9 +170,7 @@ class StorageBehavior extends \canis\db\behaviors\ActiveRecord
         if (is_null($this->storageEngine)) {
             $this->storageEngine = $this->storageObject->storageEngine;
         }
-        if ($storageObject && !$this->storageHandler->afterDelete($storageObject)) {
-            return false;
-        } elseif ($storageObject) {
+        if ($storageObject) {
             return $storageObject->delete();
         }
         return false;

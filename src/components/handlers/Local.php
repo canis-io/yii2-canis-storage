@@ -169,7 +169,7 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         }
         $package = [];
         $baseKey = $this->buildKey();
-        $package['storage_key'] = implode('.', $baseKey);
+        $package['storage_key'] = $storage->storage_key = implode('.', $baseKey);
         $dirPath = $this->baseDir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $baseKey);
         if (!is_dir($dirPath)) {
             @mkdir($dirPath, 0755, true);
@@ -182,9 +182,9 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         $path = $dirPath . DIRECTORY_SEPARATOR . $storage->primaryKey;
         $file = $model->{$attribute};
         if ($file->saveAs($path) && file_exists($path) && is_readable($path)) {
-            $package['file_name'] = $file->name;
-            $package['size'] = $file->size;
-            $package['type'] = FileHelper::getMimeType($path);
+            $package['file_name'] = $storage->file_name = $file->name;
+            $package['size'] = $storage->size = $file->size;
+            $package['type'] = $storage->type = FileHelper::getMimeType($path);
 
             return $package;
         }

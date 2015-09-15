@@ -65,7 +65,7 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
     {
         $package = [];
         $baseKey = $this->buildKey();
-        $package['storage_key'] = implode('.', $baseKey);
+        $package['storage_key'] = $storage->storage_key =  implode('.', $baseKey);
         $key = $this->getEngineStoragePath($storage);
         if ($this->destructiveShift) {
             $result = $record->rename($key);
@@ -73,9 +73,9 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
             $result = $record->copy($key);
         }
         if ($result) {
-            $package['file_name'] = $record->fileName;
-            $package['size'] = $record->size;
-            $package['type'] = $record->mimeType;
+            $package['file_name'] = $storage->file_name = $record->fileName;
+            $package['size'] = $storage->size = $record->size;
+            $package['type'] = $storage->type = $record->mimeType;
             return $package;
         }
         return false;
@@ -173,7 +173,6 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
         }
         $storage = $this->prepareStorage();
         $fill = $this->handleShift($record, $storage, $model, $attribute);
-        
         $result = $storage->fillKill($fill);
         if ($result) {
             $model->{$attribute} = $storage->primaryKey;

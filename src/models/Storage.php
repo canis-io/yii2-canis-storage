@@ -9,6 +9,7 @@
 namespace canis\storage\models;
 
 use canis\db\ActiveRecordRegistryTrait;
+use Yii;
 
 /**
  * Storage is the model class for table "storage".
@@ -31,6 +32,12 @@ class Storage extends \canis\db\ActiveRecord
 {
     use ActiveRecordRegistryTrait {
         behaviors as baseBehaviors;
+    }
+
+    public function init()
+    {
+        parent::init();
+        $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteAsset']);
     }
 
     /**
@@ -76,17 +83,14 @@ class Storage extends \canis\db\ActiveRecord
     {
         if ($attributes === false) {
             $this->delete();
-
             return false;
         } elseif ($attributes !== true) {
             $this->scenario = 'fill';
             $this->attributes = $attributes;
             if (!$this->save()) {
                 $this->delete();
-
                 return false;
             }
-
             return true;
         } else {
             return true;
@@ -147,5 +151,22 @@ class Storage extends \canis\db\ActiveRecord
     public function getStorageEngine()
     {
         return $this->hasOne(StorageEngine::className(), ['id' => 'storage_engine_id']);
+    }
+
+    public function getStorageEngineObject()
+    {
+        $storageEngine = Yii::$app->collectors['storageEngines']->getById($this->storage_engine_id);
+        if (!$storageEngine || !$storageEngine->object) {
+            return false;
+        }
+        return $storageEngine->object;
+    }
+
+    public function deleteAsset($event)
+    {
+        if (!($storageEngine = $this->storageEngineObject)) {
+            return false;
+        }
+        return $storageEngine->afterDelete($this);
     }
 }

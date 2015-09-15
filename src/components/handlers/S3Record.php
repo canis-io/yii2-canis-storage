@@ -115,7 +115,7 @@ class S3Record extends \canis\storage\components\BaseRecord
 				'Key' => $this->key
 			]);
 			$this->key = $newName;
-			return $result && $result->getPath('DeleteMarker') === true;
+			return $result && $this->exists();
 		}
 		return false;
 	}

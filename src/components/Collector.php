@@ -7,7 +7,8 @@
  */
 
 namespace canis\storage\components;
-
+use Yii;
+use yii\helpers\ArrayHelper;
 /**
  * Collector [[@doctodo class_description:cascade\components\storageHandlers\Collector]].
  *
@@ -15,6 +16,7 @@ namespace canis\storage\components;
  */
 class Collector extends \canis\base\collector\Module
 {
+    protected $_tableRegistry;
     /**
      * @var [[@doctodo var_type:_initialItems]] [[@doctodo var_description:_initialItems]]
      */
@@ -61,5 +63,46 @@ class Collector extends \canis\base\collector\Module
             $health[$engineItem->systemId] = $engineItem->storageHandler->isHealthy();
         }
         return $health;
+    }
+
+    /**
+     * Get by.
+     *
+     * @param [[@doctodo param_type:id]] $id [[@doctodo param_description:id]]
+     *
+     * @return [[@doctodo return_type:getById]] [[@doctodo return_description:getById]]
+     */
+    public function getById($id)
+    {
+        foreach ($this->tableRegistry as $entry) {
+            if ($entry->primaryKey === $id) {
+                $object = $this->getOne($entry->system_id);
+                if (isset($object->object)) {
+                    return $object;
+                }
+                break;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get table registry.
+     *
+     * @return [[@doctodo return_type:getTableRegistry]] [[@doctodo return_description:getTableRegistry]]
+     */
+    public function getTableRegistry()
+    {
+        if (is_null($this->_tableRegistry)) {
+            $engineClass = Yii::$app->classes['StorageEngine'];
+            $this->_tableRegistry = [];
+            if ($engineClass::tableExists()) {
+                $om = $engineClass::find()->all();
+                $this->_tableRegistry = ArrayHelper::index($om, 'system_id');
+            }
+        }
+
+        return $this->_tableRegistry;
     }
 }
