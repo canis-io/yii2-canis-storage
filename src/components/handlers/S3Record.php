@@ -19,6 +19,7 @@ use yii\helpers\FileHelper;
 class S3Record extends \canis\storage\components\BaseRecord
 {
 	public $key;
+	public $fileName;
 	public $size;
 	public $mime;
 	protected $_tmp;
@@ -53,6 +54,9 @@ class S3Record extends \canis\storage\components\BaseRecord
 
 	public function getFileName()
 	{
+		if (isset($this->fileName)) {
+			return $this->fileName;
+		}
 		return basename($this->key);
 	}
 

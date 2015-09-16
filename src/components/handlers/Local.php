@@ -59,6 +59,21 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         return $records;
     }
 
+    public function storageToRecord(Storage $storage)
+    {
+        $file = [];
+        $file['File'] = $this->getPath($storage);
+        $file['MimeType'] = $storage->type;
+        $file['FileName'] = $storage->file_name;
+        return Yii::createObject([
+            'class' => LocalRecord::className(),
+            'engine' => $this->storageEngine,
+            'file' => $file['File'],
+            'mime' => $file['MimeType'],
+            'fileName' => $file['FileName']
+        ]);
+    }
+
     public function getFileRecord($file)
     {
         return Yii::createObject(['class' => LocalRecord::className(), 'engine' => $this->storageEngine, 'file' => $file]);
@@ -153,6 +168,20 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         return implode(DIRECTORY_SEPARATOR, $this->buildKey()) . DIRECTORY_SEPARATOR . $storage->primaryKey;
     }
 
+    public function take(FileInterface $file, $path)
+    {
+        $filePath = $file->tempName;
+        try {
+            if ($file->saveAs($path) && file_exists($path) && is_readable($path)) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            throw $e;
+            return false;
+        }
+        return false;
+    }
+
     /**
      * [[@doctodo method_description:handleUpload]].
      *
@@ -181,7 +210,7 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         }
         $path = $dirPath . DIRECTORY_SEPARATOR . $storage->primaryKey;
         $file = $model->{$attribute};
-        if ($file->saveAs($path) && file_exists($path) && is_readable($path)) {
+        if ($this->take($file, $path)) {
             $package['file_name'] = $storage->file_name = $file->name;
             $package['size'] = $storage->size = $file->size;
             $package['type'] = $storage->type = FileHelper::getMimeType($path);

@@ -81,6 +81,10 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\base\
         return false;
     }
 
+    abstract public function take(FileInterface $file, $location);
+
+    abstract public function storageToRecord(Storage $storage);
+
     /**
      * [[@doctodo method_description:serve]].
      *

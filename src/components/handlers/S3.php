@@ -99,6 +99,23 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
         return $records;
     }
 
+    public function storageToRecord(Storage $storage)
+    {
+        $file = [];
+        $file['Key'] = $this->getKey($storage);
+        $file['MimeType'] = $storage->type;
+        $file['Size'] = $storage->size;
+        $file['FileName'] = $storage->file_name;
+        return Yii::createObject([
+            'class' => S3Record::className(),
+            'engine' => $this->storageEngine,
+            'key' => $file['Key'],
+            'size' => $file['Size'],
+            'mime' => $file['MimeType'],
+            'fileName' => $file['FileName']
+        ]);
+    }
+
     public function getFileRecord($file)
     {
         return Yii::createObject([
@@ -278,6 +295,29 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
         return implode('/', $this->buildKey()) . '/' . $storage->primaryKey;
     }
 
+    public function take(FileInterface $file, $key)
+    {
+        $filePath = $file->tempName;
+        try {
+            $fileStream = fopen($filePath, 'r+');
+            $options = [
+                'params' => [
+                    'StorageClass' => $this->reducedRedundancy ? 'REDUCED_REDUNDANCY' : 'STANDARD'
+                ]
+            ];
+            if ($this->encrypt) {
+                $options['params']['ServerSideEncryption'] = 'AES256';
+            }
+            $uploadResult = $this->getClient()->upload($this->bucket, $key, $fileStream, $this->acl, $options);
+            fclose($fileStream);
+            return $uploadResult;
+        } catch (\Exception $e) {
+            throw $e;
+            return false;
+        }
+        return false;
+    }
+
     /**
      * [[@doctodo method_description:handleUpload]].
      *
@@ -297,31 +337,14 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
         $package['storage_key'] = $storage->storage_key = implode('.', $baseKey);
         $key = $this->getEngineStoragePath($storage);
         $file = $model->{$attribute};
-        $filePath = $file->tempName;
-        try {
-            $fileStream = fopen($filePath, 'r+');
-            $options = [
-                'params' => [
-                    'StorageClass' => $this->reducedRedundancy ? 'REDUCED_REDUNDANCY' : 'STANDARD'
-                ]
-            ];
-            if ($this->encrypt) {
-                $options['params']['ServerSideEncryption'] = 'AES256';
+        if ($this->take($file, $key)) {
+            if ($uploadResult && $this->isCachingEnabled()) {
+                $this->saveCache($storage, file_get_contents($filePath));
             }
-            $uploadResult = $this->getClient()->upload($this->bucket, $key, $fileStream, $this->acl, $options);
-            fclose($fileStream);
-            if ($uploadResult) {
-                if ($uploadResult && $this->isCachingEnabled()) {
-                    $this->saveCache($storage, file_get_contents($filePath));
-                }
-                $package['file_name'] = $storage->file_name = $file->name;
-                $package['size'] = $storage->size = $file->size;
-                $package['type'] = $storage->type = $file->type;
-                return $package;
-            }
-        } catch (\Exception $e) {
-            throw $e;
-            return false;
+            $package['file_name'] = $storage->file_name = $file->name;
+            $package['size'] = $storage->size = $file->size;
+            $package['type'] = $storage->type = $file->type;
+            return $package;
         }
         return false;
     }
