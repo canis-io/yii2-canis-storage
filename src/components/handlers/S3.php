@@ -338,7 +338,7 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
         $key = $this->getEngineStoragePath($storage);
         $file = $model->{$attribute};
         if ($this->take($file, $key)) {
-            if ($uploadResult && $this->isCachingEnabled()) {
+            if ($this->isCachingEnabled()) {
                 $this->saveCache($storage, file_get_contents($filePath));
             }
             $package['file_name'] = $storage->file_name = $file->name;
