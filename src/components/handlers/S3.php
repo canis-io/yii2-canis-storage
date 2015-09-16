@@ -312,7 +312,6 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
             fclose($fileStream);
             return $uploadResult;
         } catch (\Exception $e) {
-            throw $e;
             return false;
         }
         return false;
