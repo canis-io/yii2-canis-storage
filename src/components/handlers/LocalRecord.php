@@ -13,7 +13,7 @@ use yii\helpers\FileHelper;
 
 class LocalRecord extends \canis\storage\components\BaseRecord
 {
-	public $fileName;
+	protected $fileName;
 	public $file;
 	public $mime;
 
@@ -42,6 +42,12 @@ class LocalRecord extends \canis\storage\components\BaseRecord
 			return false;
 		}
 		return basename($this->file);
+	}
+
+	public function setFileName($fileName)
+	{
+		$this->fileName = $filename;
+		return true;
 	}
 
 	public function getSize()
