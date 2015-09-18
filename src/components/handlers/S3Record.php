@@ -21,7 +21,7 @@ class S3Record extends \canis\storage\components\BaseRecord
 	public $key;
 	public $size;
 	public $mime;
-	protected $fileName;
+	protected $_fileName;
 	protected $_tmp;
 
 	public function collect()
@@ -54,8 +54,8 @@ class S3Record extends \canis\storage\components\BaseRecord
 
 	public function getFileName()
 	{
-		if (isset($this->fileName)) {
-			return $this->fileName;
+		if (isset($this->_fileName)) {
+			return $this->_fileName;
 		}
 
 		return basename($this->key);
@@ -63,7 +63,7 @@ class S3Record extends \canis\storage\components\BaseRecord
 
 	public function setFileName($fileName)
 	{
-		$this->fileName = $filename;
+		$this->_fileName = $filename;
 		return true;
 	}
 

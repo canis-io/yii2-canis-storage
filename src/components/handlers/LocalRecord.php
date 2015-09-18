@@ -13,7 +13,7 @@ use yii\helpers\FileHelper;
 
 class LocalRecord extends \canis\storage\components\BaseRecord
 {
-	protected $fileName;
+	protected $_fileName;
 	public $file;
 	public $mime;
 
@@ -35,8 +35,8 @@ class LocalRecord extends \canis\storage\components\BaseRecord
 
 	public function getFileName()
 	{
-		if (isset($this->fileName)) {
-			return $this->fileName;
+		if (isset($this->_fileName)) {
+			return $this->_fileName;
 		}
 		if (!file_exists($this->file)) {
 			return false;
@@ -46,7 +46,7 @@ class LocalRecord extends \canis\storage\components\BaseRecord
 
 	public function setFileName($fileName)
 	{
-		$this->fileName = $filename;
+		$this->_fileName = $filename;
 		return true;
 	}
 
