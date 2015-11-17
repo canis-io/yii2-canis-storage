@@ -8,7 +8,7 @@
 	"minimum-stability": "dev",
 	"require": {
 		"php": ">=5.4.0",
-		"canis/yii2-canis-lib": "*",
+		"canis/yii2-canis-lib": "1.*",
         "aws/aws-sdk-php": "3.3.*"
 	},
 	"require-dev": {
