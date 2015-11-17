@@ -43,6 +43,8 @@ abstract class BaseHandler extends \canis\base\Component implements \canis\colle
 
     abstract public function exists(Storage $model);
 
+    abstract public function handleRekey(Storage $oldStorage, Storage $newStorage);
+    
     /**
      * [[@doctodo method_description:generateInternal]].
      *

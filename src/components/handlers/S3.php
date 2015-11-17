@@ -99,6 +99,15 @@ class S3 extends \canis\storage\components\BaseHandler implements \canis\storage
         return $records;
     }
 
+
+    public function handleRekey(Storage $oldStorage, Storage $newStorage)
+    {
+        $oldRecord = $this->storageToRecord($oldStorage);
+        $newRecord = $this->storageToRecord($newStorage);
+        return $oldRecord->rename($newRecord->key);
+    }
+
+
     public function storageToRecord(Storage $storage)
     {
         $file = [];

@@ -34,10 +34,14 @@ class Storage extends \canis\db\ActiveRecord
         behaviors as baseBehaviors;
     }
 
+    public $originalStorageModel;
+
     public function init()
     {
         parent::init();
         $this->on(self::EVENT_AFTER_DELETE, [$this, 'deleteAsset']);
+        $this->on(self::EVENT_AFTER_UPDATE, [$this, 'afterUpdateFilePath']);
+        $this->on(self::EVENT_BEFORE_UPDATE, [$this, 'beforeUpdateFilePath']);
     }
 
     /**
@@ -168,5 +172,25 @@ class Storage extends \canis\db\ActiveRecord
             return false;
         }
         return $storageEngine->afterDelete($this);
+    }
+
+    public function beforeUpdateFilePath($event)
+    {
+        $dirty = $this->getDirtyAttributes();
+        if (isset($dirty['id'])) {
+            $old = $this->getOldAttributes();
+            $this->originalStorageModel = clone $this;
+            $this->originalStorageModel->attributes = $old;
+        }
+    }
+
+    public function afterUpdateFilePath($event)
+    {
+        if (!empty($this->originalStorageModel)) {
+            if (!($storageEngine = $this->storageEngineObject)) {
+                return false;
+            }
+            return $storageEngine->handleRekey($this->originalStorageModel, $this);
+        }
     }
 }

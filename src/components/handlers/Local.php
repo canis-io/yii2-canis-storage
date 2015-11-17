@@ -74,6 +74,17 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
         ]);
     }
 
+    public function handleRekey(Storage $oldStorage, Storage $newStorage)
+    {
+        $oldPath = $this->getPath($oldStorage);
+        $newPath = $this->getPath($newStorage);
+        if (!file_exists($oldPath)) {
+            return false;
+        }
+        rename($oldPath, $newPath);
+        return file_exists($newPath);
+    }
+
     public function getFileRecord($file)
     {
         return Yii::createObject(['class' => LocalRecord::className(), 'engine' => $this->storageEngine, 'file' => $file]);
