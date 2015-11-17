@@ -10,7 +10,7 @@ namespace canis\storage\components;
 
 use canis\storage\models\Storage;
 use canis\storage\models\StorageEngine;
-use canis\base\collector\CollectedObjectTrait;
+use canis\collector\CollectedObjectTrait;
 use canis\base\FileInterface;
 use canis\helpers\Date;
 use Yii;
@@ -20,7 +20,7 @@ use Yii;
  *
  * @author Jacob Morrison <email@ofjacob.com>
  */
-abstract class BaseHandler extends \canis\base\Component implements \canis\base\collector\CollectedObjectInterface
+abstract class BaseHandler extends \canis\base\Component implements \canis\collector\CollectedObjectInterface
 {
     use CollectedObjectTrait;
 

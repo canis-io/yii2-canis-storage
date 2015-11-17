@@ -18,7 +18,7 @@ use Yii;
  *
  * @author Jacob Morrison <email@ofjacob.com>
  */
-class Item extends \canis\base\collector\Item
+class Item extends \canis\collector\Item
 {
     public $ensureGroups = [];
     private $_model;

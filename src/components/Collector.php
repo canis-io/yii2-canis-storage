@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
  *
  * @author Jacob Morrison <email@ofjacob.com>
  */
-class Collector extends \canis\base\collector\Module
+class Collector extends \canis\collector\Module
 {
     protected $_tableRegistry;
     /**
