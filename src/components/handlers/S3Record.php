@@ -63,7 +63,7 @@ class S3Record extends \canis\storage\components\BaseRecord
 
 	public function setFileName($fileName)
 	{
-		$this->_fileName = $filename;
+		$this->_fileName = $fileName;
 		return true;
 	}
 
