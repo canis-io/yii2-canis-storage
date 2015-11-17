@@ -34,7 +34,7 @@ class Storage extends \canis\db\ActiveRecord
         behaviors as baseBehaviors;
     }
 
-    public $originalStorageModel;
+    protected $originalStorageModel;
 
     public function init()
     {
@@ -178,9 +178,11 @@ class Storage extends \canis\db\ActiveRecord
     {
         $dirty = $this->getDirtyAttributes();
         if (isset($dirty['id'])) {
-            $old = $this->getOldAttributes();
-            $this->originalStorageModel = clone $this;
-            $this->originalStorageModel->attributes = $old;
+            $oldId = $this->getOldPrimaryKey();
+            if (!empty($oldId)) {
+                $this->originalStorageModel = clone $this;
+                $this->originalStorageModel->id = $oldId;
+            }
         }
     }
 

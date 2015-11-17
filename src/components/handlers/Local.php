@@ -78,7 +78,7 @@ class Local extends \canis\storage\components\BaseHandler implements \canis\stor
     {
         $oldPath = $this->getPath($oldStorage);
         $newPath = $this->getPath($newStorage);
-        if (!file_exists($oldPath)) {
+        if (!is_file($oldPath)) {
             return false;
         }
         rename($oldPath, $newPath);
