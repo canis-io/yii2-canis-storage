@@ -44,7 +44,7 @@ class LocalRecord extends \canis\storage\components\BaseRecord
 		return basename($this->file);
 	}
 
-	public function setFileName($fileName)
+	public function setFileName($filename)
 	{
 		$this->_fileName = $filename;
 		return true;
